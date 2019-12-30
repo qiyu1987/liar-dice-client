@@ -9,7 +9,8 @@ class App extends Component {
 	stream = new EventSource(`${this.url}/stream`)
 
 	state = {
-		text: ""
+		text: "",
+		rooms: []
 	}
 
 	componentDidMount() {
@@ -18,7 +19,26 @@ class App extends Component {
 
 			const action = JSON.parse(data)
 
-			console.log(action)
+			console.log("action test:", action)
+
+			const { type, payload } = action
+
+			switch (type) {
+				case "ALL_ROOMS": {
+					return this.setState({
+						rooms: payload
+					})
+				}
+				case "NEW_ROOM": {
+					const rooms = [...this.state.rooms, payload]
+
+					return this.setState({
+						rooms
+					})
+				}
+				default:
+					console.log("Ignore:", type)
+			}
 		}
 	}
 
@@ -44,12 +64,38 @@ class App extends Component {
 		this.setState({ text: value })
 	}
 
+	onClick = async roomId => {
+		console.log("roomId test:", roomId)
+		try {
+			const response = await superagent.put(`${this.url}/join`).send({
+				roomId,
+				userId: 1
+			})
+
+			console.log("response test:", response)
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
 	render() {
+		const { rooms } = this.state
+
+		const list = rooms.map(room => (
+			<div key={room.id}>
+				{room.name}
+				<button onClick={() => this.onClick(room.id)}>Join</button>
+			</div>
+		))
+
 		return (
-			<form onSubmit={this.onSubmit}>
-				<input type="text" onChange={this.onChange} value={this.state.text} />
-				<button>Submit</button>
-			</form>
+			<main>
+				<form onSubmit={this.onSubmit}>
+					<input type="text" onChange={this.onChange} value={this.state.text} />
+					<button>Submit</button>
+				</form>
+				{list}
+			</main>
 		)
 	}
 }
