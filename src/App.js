@@ -4,6 +4,7 @@ import React, { Component } from "react"
 import { Route } from "react-router-dom"
 import { connect } from "react-redux"
 import Home from "./components/Home"
+import Lobby from "./components/Lobby"
 
 class App extends Component {
 	url = "http://localhost:4000"
@@ -22,7 +23,7 @@ class App extends Component {
 	render() {
 		return (
 			<div>
-				<Route path="/" exact component={Home} />
+				<Route path="/" exact component={Lobby} />
 			</div>
 		)
 	}
